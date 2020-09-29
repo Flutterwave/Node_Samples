@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,300i,400,400i,600,600i,700,700i,800,800i" rel="stylesheet">
+
+        <title>Corona School Payment Platform</title>
+
+    <link rel="stylesheet" href="http://localhost:3002/css">
+    
+</head>
+<body>
+
+  <div class="page-wrapper bg-gra-03 p-t-45 p-b-50">
+    <div class="wrapper wrapper--w790">
+        <div class="card card-5">
+            <div class="card-heading" style="background: rgb(218, 37, 29);">
+                <h2 class="title" style="font-size: 18px">SECONDARY SCHOOL - PAYMENT FORM</h2>
+            </div>
+            <div class="card-body">
+                <p><b>NB:</b> The extra data that you want to pass to the payload can be passed through <b>Meta-data</b> in your payload. Check the code to see example of how extra information is passed in the payload.</p>
+                <br><br>
+
+                <!-- <form id="corona_form"> -->
+
+                    <div class="form-row">
+                      <div class="name">Student's Class</div>
+                      <div class="value">
+                          <div class="input-group">
+                            <select name="studentclass" class="input--style-5" id="studentclass" required>
+                              <option disabled="disabled" selected="selected">-- Choose your class --</option>
+                              <option value="Nursery 1">Nursery 1</option>
+                              <option value="Nursery 2">Nursery 2</option>
+                              <option value="Primary 1">Primary 1</option>
+                              <option value="Primary 2">Primary 2</option>
+                              <option value="Primary 3">Primary 3</option>
+                              <option value="Primary 4">Primary 4</option>
+                              <option value="Primary 5">Primary 5</option>
+                              <option value="Primary 6">Primary 6</option>
+                              <option value="Year 7">Year 7</option>
+                              <option value="Year 8">Year 8</option>
+                              <option value="Year 9">Year 9</option>
+                              <option value="Year 10">Year 10</option>
+                              <option value="Year 11">Year 11</option>
+                              <option value="Year 12">Year 12</option>
+                          </select>
+                          </div>
+                          <span id="msg"></span>
+                      </div>                            
+                  </div>
+                    <div class="form-row">
+                      <div class="name">Term</div>
+                      <div class="value">
+                          <div class="input-group">
+                            <select name="term" id="term" class="input--style-5" required>
+                              <option disabled="disabled" selected="selected">-- Choose Term --</option>
+                              <option value="FIRST TERM">FIRST TERM</option>
+                              <option value="SECOND TERM">SECOND TERM</option>
+                              <option value="THIRD TERM">THIRD TERM</option>
+                          </select>
+                          </div>
+                          <span id="msg"></span>
+                      </div>                            
+                  </div>
+                    <div class="form-row">
+                      <div class="name">First Name</div>
+                      <div class="value">
+                          <div class="input-group">
+                            <input class="input--style-5" type="text" name="first_name" id="first_name" required>
+                           
+                          </div>
+                          <span id="msg"></span>
+                      </div>                            
+                  </div>
+                  <div class="form-row">
+                    <div class="name">Last Name</div>
+                    <div class="value">
+                        <div class="input-group">
+                          <input class="input--style-5" type="text" name="last_name" id="last_name" required>
+                          
+                        </div>
+                        <span id="msg"></span>
+                    </div>                            
+                </div>
+                    <div class="form-row">
+                        <div class="name">Student ID</div>
+                        <div class="value">
+                            <div class="input-group">
+                                <input class="input--style-5" type="text" name="student_id" id="student_id" required>
+                            </div>
+                            <span id="msg"></span>
+                        </div>                            
+                    </div>
+        
+         <div class="form-row">
+                        <div class="name">Name of Payer</div>
+                        <div class="value">
+                            <div class="input-group">
+                                <input class="input--style-5" type="text" name="payer" id="payer" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+        
+        <div class="form-row">
+                        <div class="name">Payment Purpose</div>
+                        <div class="value">
+                            <div class="input-group">
+                                <input class="input--style-5" type="text" name="payment_purpose" id="payment_purpose" required>
+                            </div>
+                        </div>
+                    </div>
+        
+        
+         <div class="form-row">
+                        <div class="name">Amount</div>
+                        <div class="value">
+                            <div class="input-group">
+                                <input class="input--style-5" type="number" name="amount" id="amount" required>
+                            </div>
+                        </div>
+                    </div>
+        
+                    <div class="form-row">
+                        <div class="name">Email</div>
+                        <div class="value">
+                            <div class="input-group">
+                                <input class="input--style-5" type="email" name="email" id="email" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="name">Phone</div>
+                        <div class="value">
+                            <div class="input-group">
+                                <input class="input--style-5" type="text" name="phone" id="phone" required>
+                            </div>
+                        </div>
+                    </div>  
+
+                    <div>
+                        <button class="btn btn--radius-2 btn--red pull-right" id="charge" type="button" >Continue >></button>
+                    </div>
+                    <br><br>
+                <!-- </form> -->
+            </div>
+        </div>
+    </div>
+</div>
+
+    
+    
+</body>
+
+<script>
+  
+  document.addEventListener("DOMContentLoaded", async () => {
+    const cardFormDOM = document.querySelector("#charge");
+
+    cardFormDOM.addEventListener("click", async e => {
+      try {
+        e.preventDefault();
+        
+      const studentClass = document.querySelector('#studentclass').value;
+      const firstName = document.querySelector('#first_name').value;
+      const lastName = document.querySelector('#last_name').value;
+      const studentId = document.querySelector('#student_id').value;
+      const term = document.querySelector('#term').value;
+      const payer = document.querySelector('#payer').value;
+      const paymentPurpose = document.querySelector('#payment_purpose').value;
+      const amount = document.querySelector('#amount').value;
+      const email = document.querySelector('#email').value;
+      const phone = document.querySelector('#phone').value;
+
+      if (firstName == "" || lastName == "" || studentId == "" || payer == "" || paymentPurpose == "" || amount == "" || email == "" || phone == "" || term == "" || studentClass == "") {
+                alert("All fields must be filled.");
+        } else {
+          FlutterwaveCheckout({
+              public_key: "FLWPUBK_TEST-SANDBOXDEMOKEY-X", // add your pubilic key
+              tx_ref: Date.now(),
+              amount: amount,
+              currency: "NGN",
+              payment_options: "card, mobilemoneyghana, ussd",
+              redirect_url: // specified redirect URL
+                "http://127.0.0.1:5500/extra_info/index.html",
+                meta: [
+                                {
+                            metaname: "nameOfStudent",
+                            metavalue: firstName+' '+lastName,
+                        },
+                        {
+                            metaname: "studentClass",
+                            metavalue: studentClass
+                        },
+                        {
+                            metaname: 'studentId',
+                            metavalue: studentId
+                        },
+                        {
+                            metaname: 'term',
+                            metavalue: term
+                        },
+                        {
+                            metaname: 'paymentPurpose',
+                            metavalue: paymentPurpose
+                        }
+                    ],
+              customer: {
+                email: email,
+                phone_number: phone,
+                name: payer,
+              },
+              callback: function (data) {
+            console.log(data);
+            if(data['status'] == 'successful'){
+                    // You can hanlde success here
+          }else{
+                  alert('We are sorry, payment didn\'t go through!');
+          }
+            },
+            onclose: function() {
+              // close modal
+            },
+            customizations: {
+              title: "My store",
+              description: "Payment for items in cart",
+              logo: 'https://st2.depositphotos.com/4403291/7418/v/450/depositphotos_74189661-stock-illustration-online-shop-log.jpg',
+            },
+          });
+
+        }
+
+      } catch (error) {
+        console.log(error)
+        
+      }
+
+      
+    })
+
+
+  });
+
+  </script>
+  <script type="text/javascript" src="https://checkout.flutterwave.com/v3.js"></script>
+
+</html>

@@ -1,0 +1,110 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Simple Payroll</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    
+
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-4 col-md-offset-MMM4">
+                <h2>A simple payroll system using Flutterwave's Rave Node SDK.</h2>
+                <small>Visit the <a href="http://localhost:3002/docs" target="_blank"><b>Documentation</b></a> to read more of the different APIs used to achieve this.</small>
+                <div class="login-panel panel panel-default">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Please Sign In</h3>
+                    </div>
+                    <div class="panel-body">
+                        <form role="form" id="user">
+                            <fieldset>
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Username" name="username" type="text" autofocus>
+                                </div>
+                                <div class="form-group">
+                                    <input class="form-control" placeholder="Password" name="password" type="password">
+                                </div>
+                                <div class="checkbox">
+                                    <label>
+                                        <input name="remember" type="checkbox" value="Remember Me">Remember Me
+                                    </label>
+                                </div>
+                                <input type="submit" name="login" value="Login" class="btn btn-lg btn-success btn-block">
+                            </fieldset>
+                        </form>
+                        <br>
+                        <b>Login Details:</b><br>
+                        Username: user<br>
+                        Password: password1
+                    </div>
+                
+                
+                
+                  </div>
+            </div>
+        </div>
+    </div>
+
+    
+</body>
+
+<script>
+  
+    
+    document.addEventListener("DOMContentLoaded", async () => {
+      
+  
+      const cardFormDOM = document.querySelector("#user");
+      cardFormDOM.addEventListener("submit", async e => {
+        try {
+          e.preventDefault();
+        const username = document.querySelector('input[name="username"]').value;
+        const password = document.querySelector('input[name="password"]').value;
+        
+        const rawResponse = await fetch('http://localhost:3002/auth/signin', {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({username, password})
+        });
+        const result = await rawResponse.json();
+        if(result.status !== 200){
+          alert(result.error)
+        }else{
+          window.location.href = 'dashboard/index.html'
+        }
+          
+        } catch (error) {
+          console.log(error)
+          
+        }
+  
+        
+      })
+ 
+  
+  
+    });
+  
+  
+  
+  
+    </script>
+  
+
+</html>

@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flutterwave Modal</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+      
+</head>
+<body>
+  <div class="d-flex justify-content-center mt-5">
+    <div class="mx-3">
+      <button type="button" onClick="pay()"> Pay Inline Modal </button>
+  </div>
+
+  <div>
+      <button type="button" onClick="standardModalPayment()"> standard modal </button>
+  </div>
+
+  </div>
+    
+</body>
+
+<script>
+    
+    const standardModalPayment = async() => {
+      try {
+        const result  = await fetch("/standard-modal")
+        const response =  await result.json()
+        const {link } = response.data
+			  window.location.href=link;
+        
+      } catch (error) {
+        console.log(error)
+        
+      }
+    }
+
+    const PUBLIC_KEY = "FLWPUBK-XXXX"
+    function pay() {
+      FlutterwaveCheckout({
+        public_key: PUBLIC_KEY,
+        tx_ref: Date.now(),
+        amount: 300,
+        currency: "NGN",
+        payment_options: 'card,mobilemoney,ussd',
+        redirect_url: 
+          "http://localhost:3002/",
+        meta: {
+          consumer_id: 3,
+          consumer_mac: "wded-eewww111-eeww2",
+        },
+        customer: {
+          email: "joel@gmail.com",
+          phone_number: "07064586146",
+          name: "Joel ugwumadu",
+        },
+        callback: function (data) {
+          if(data['status'] == 'successful'){
+            console.log(data) // Handle successful transaction 
+            alert('success'); 
+          }else{
+              alert('Failed'); // Failed
+          }
+        },
+        onclose: function() {
+          // close modal
+        },
+        customizations: {
+            title: 'Pay Joel',
+            description: 'Payment for items in cart',
+            logo: 'https://st2.depositphotos.com/4403291/7418/v/450/depositphotos_74189661-stock-illustration-online-shop-log.jpg',
+    
+        },
+      });
+    }
+    
+  </script>
+    <script type="text/javascript" src="https://checkout.flutterwave.com/v3.js"></script>
+
+</html>

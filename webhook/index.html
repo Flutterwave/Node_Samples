@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flutterwave Webhook Test</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+      
+</head>
+<body>
+  <div class="container">
+      <div class="row">
+        <div class="col-md-8">
+          <label for="">Email address</label>
+          <input type="text" name="email" id="email" class="form-control border-input" placeholder="Enter email address" style="margin-bottom: 30px;">
+        </div>
+      </div>
+
+        <button id="test" class="btn btn-primary">Pay Now</button>
+      
+  </div>
+    
+</body>
+
+<script>
+    
+  const submitBTn = document.getElementById('test')
+
+  submitBTn.addEventListener("click", function(e) {
+    e.preventDefault();
+        const email = document.getElementById('email').value;
+        makePayment(email)
+        console.log("yes oooooooooo")
+        console.log(email)
+    })
+    
+    function makePayment(email) {
+    FlutterwaveCheckout({
+      public_key: "FLWPUBK-d5f9ffa65be83a121705e72e0f6a2679-X",
+      tx_ref: "hooli-tx-1920bbtyt",
+      amount: 100,
+      currency: "NGN",
+      payment_options: "card",
+      customer: {
+        email: email,
+        phone_number: "07064586146",
+        name: "Joel ugwumadu",
+      },
+      callback: function (data) {
+		if(data['status'] == 'successful'){
+			console.log(data) /// handle successful transaction
+		}else{
+			alert("Transaction is unsuccessful");
+		}
+      },
+      onclose: function() {
+        // close modal
+      },
+      customizations: {
+        title: "My store",
+        description: "Payment for items in cart",
+        logo: "https://www.designevo.com/images/home/3d-green-letter-o.png",
+      },
+    });
+  
+  }
+  
+  </script>
+    <script type="text/javascript" src="https://checkout.flutterwave.com/v3.js"></script>
+
+</html>

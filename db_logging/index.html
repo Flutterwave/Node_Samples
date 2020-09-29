@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="http://localhost:3002/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+        <title>Sample Payment Page and Database Logging</title>
+</head>
+<body>
+  <div class="container mt-4">
+    <h2 class="my-4 text-center">Buy this Dress for 1000</h2>
+    <p class="text-center">After payment, the necessary details will be logged to the DB.</p>
+    <hr>
+    <img src="https://media.gettyimages.com/vectors/red-dress-on-hanger-icon-vector-id656061762?k=6&m=656061762&s=612x612&w=0&h=ChCMishCdaUVxFT0DCTAqsdg5Io25k525XUDsXWbb7w=">
+    <form id="payment-form">
+      <div class="form-group">
+        <input type="text" name="full_name" id="full_name" class="form-control col-md-6 pageElement pageElement--empty" placeholder="Full Name" required>
+        <input type="text" name="phone_number" id="number" class="form-control col-md-6 pageElement pageElement--empty" placeholder="Phone Number" required>
+        <input type="email" name="email" id="email" class="form-control col-md-6 pageElement pageElement--empty" placeholder="Email Address" required>
+        <input type="text" name="address" id="home_address" class="form-control col-md-6 pageElement pageElement--empty" placeholder="Home Address" required>
+        <!-- Used to display form errors -->
+        <div id="card-errors" role="alert"></div>
+      </div>
+
+      <button type="submit">Place Order</button>
+    </form>
+  </div>
+    
+</body>
+
+<script>
+ 
+
+ 
+  
+  document.addEventListener("DOMContentLoaded", async () => {
+    const cardFormDOM = document.querySelector("#payment-form");
+
+    cardFormDOM.addEventListener("submit", async e => {
+      try {
+        e.preventDefault();
+      const email = document.querySelector('#email').value;
+      const fullname = document.querySelector('#full_name').value;
+      const number = document.querySelector('#number').value;
+      const address = document.querySelector('#home_address').value;
+
+      getpaidSetup({
+        PBFPubKey: "FLWPUBK_TEST-SANDBOXDEMOKEY-X", // Add your public key here
+        customer_email: email,
+        amount: 1000,
+        customer_phone: number,
+        currency: "NGN",
+        customer_firstname: fullname,
+        txref: Date.now(),
+        meta: [{
+            metaname: "address",
+            metavalue: address
+        }],
+        onclose: function() {},
+        callback: async(response) => {
+            if (
+                response.tx.chargeResponseCode == "00" ||
+                response.tx.chargeResponseCode == "0"
+            ) {
+                // redirect to a success page
+                //  Handle success
+                console.log("success")
+                const verifyResData = await fetch('/flutterwave/verify', {
+                method: 'POST',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({txref: response.tx.txRef})
+              });
+              const content = await verifyResData.json();
+              const containerWrapperDOM = document.querySelector(".container");
+              containerWrapperDOM.innerHTML = `
+              <div >
+                <h2>Thank you for ordering cloth from us</h2>
+                <hr>
+                <p>Check your email for the reciept</p>
+                <div class="btn-group" role="group">
+                  <button onClick="customers()" class="btn btn-success"> Customers</button>
+                  <button onClick="handleTransactionRecord()" class="btn btn-success mx-2"> Transactions</button>
+                  
+                </div>
+                <button onClick="home()" class="btn btn-success">Go Back</button>
+            </div>
+              
+              `;
+              
+
+            } else {
+                //  Handle failure
+                alert('We are sorry, payment didn\'t go through!');
+
+
+            } 
+
+            close(); // use this to close the modal immediately after payment.
+        }
+    });
+      
+  } catch (error) {
+        console.log(error)
+        
+      }
+
+      
+    })
+
+
+  });
+
+  const customers = async() => {
+    let containerWrapperDOM = document.querySelector(".container");
+    const getCustomers = await fetch('/flutterwave/customers', {
+                method: 'GET',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                }
+              });
+      const content = await getCustomers.json();
+      containerWrapperDOM.innerHTML = `
+      <div class="container mt-4">
+    <div class="btn-group" role="group">
+      <button onClick="customers()" class="btn btn-success"> Customers</button>
+                  <button onClick="handleTransactionRecord()" class="btn btn-success mx-2"> Transactions</button>
+                  
+    </div>
+    <hr>
+    <h2>Customers</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Customer ID</th>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+        </tr>
+      </thead>
+      <tbody class="customer-table">
+        
+      </tbody>
+    </table>
+    <br>
+    <button onClick="home()" class="btn btn-success">Home page</button>
+  </div>
+      `;
+
+    const customerTable = document.querySelector(".customer-table");
+    content.data.map(item => {
+      customerTable.innerHTML += `
+          <tr>
+            <td> ${item.customer_id}</td>
+            <td>${item.name}</td>
+            <td>${item.email}</td>
+            <td>${item.phone}</td>
+          </tr>
+
+      `;
+
+    })
+
+    
+
+  }
+
+  const handleTransactionRecord = async() => {
+    const containerWrapperDOM = document.querySelector(".container");
+    const getCustomers = await fetch('/flutterwave/transactions', {
+                method: 'GET',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                }
+              });
+      const content = await getCustomers.json();
+      
+
+
+      containerWrapperDOM.innerHTML = `
+      <div class="container mt-4">
+    <div class="btn-group" role="group">
+      <button onClick="customers()" class="btn btn-success"> Customers</button>
+                  <button onClick="handleTransactionRecord()" class="btn btn-success mx-2"> Transactions</button>
+                  
+    </div>
+    <hr>
+    <h2>Transactions</h2>
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Transaction ID</th>
+          <th>Customer</th>
+          <th>status</th>
+          <th>Amount</th>
+        </tr>
+      </thead>
+      <tbody class="customer-table">
+        
+      </tbody>
+    </table>
+    <br>
+    <button onClick="home()" class="btn btn-success">Home page</button>
+  </div>
+      `;
+
+    const transTable = document.querySelector(".customer-table");
+    content.data.map(item => {
+      transTable.innerHTML += `
+          <tr>
+            <td> ${item.transactions_id}</td>
+            <td>${item.customer_id}</td>
+            <td>${item.status}</td>
+            <td>${item.amount}</td>
+          </tr>
+
+      `;
+    })
+      
+
+
+    
+
+  }
+
+  const home = () => {
+    window.location.href= "http://localhost:3002"
+  }
+
+
+
+  </script>
+ <script type="text/javascript" src="https://ravesandboxapi.flutterwave.com/flwv3-pug/getpaidx/api/flwpbf-inline.js"></script>
+
+</html>

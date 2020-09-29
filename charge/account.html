@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+        <title>Flutterwave Charge Sample Apps</title>
+</head>
+<body>
+
+  <div class="container">
+    <div class="row">
+          <div class="col-md-12 text-center">
+            <h1> Account Transaction</h1>
+        </div>
+        <div class="offset-md-4 col-md-4 text-center">
+          <p style="text-align:left">
+              <b>Test with the below test card:</b><br>
+              Access Bank<br>
+              Account number: 0690000031<br>
+              otp: 12345
+          </p>
+
+      </div>
+
+      <div class="offset-md-4 col-md-4">
+        <div class="alert" role="alert">
+        
+      </div>
+
+
+
+    <div class="form-wrapper">
+        <form id="charge">
+          <div class="form-group">
+            <label for="">Email</label>
+            <input type="text" name="email" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="">Amount</label>
+            <input type="number" name="amount" class="form-control">
+        </div>
+        <div class="form-group">
+            <label for="">Select Bank</label>
+            <select name="account_bank" class="form-control">
+                <option value="">-- select bank --</option>
+                <option value="044"> Access Bank</option>
+                <option value="315"> GTMobile</option>
+                <option value="033"> United Bank for Africa </option>
+                <option value="90115"> TCF MFB </option>
+                
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="">Enter Account Number</label>
+            <input type="text" name="account_number" class="form-control">
+        </div>
+        <div class="form-group">
+            <input type="submit" name="initiate" class="btn btn-success btn-block" value="Pay">
+        </div>
+      </form>
+    </div>
+
+      </div>
+
+    </div>
+</div>
+
+    
+    
+</body>
+
+<script>
+ 
+
+ 
+  
+  document.addEventListener("DOMContentLoaded", async () => {
+  
+    
+    const cardFormDOM = document.querySelector("#charge");
+    cardFormDOM.addEventListener("submit", async e => {
+      try {
+        e.preventDefault();
+      const email = document.querySelector('input[name="email"]').value;
+      const amount = document.querySelector('input[name="amount"]').value;
+      const account_bank = document.querySelector('select[name="account_bank"]').value;
+      const account_number = document.querySelector('input[name="account_number"]').value;
+      
+      const alartDOM = document.querySelector(".alert");
+              alartDOM.classList.remove("alert-info")
+              alartDOM.innerText = ""
+      const reqData = JSON.stringify({
+        account_bank,
+        account_number,
+          currency: "NGN",
+          payment_type: "account",
+          redirect_url: 'http://localhost:3002', 
+          amount,
+          email,
+          tx_ref: Date.now(),
+        })
+
+      const rawResponse = await fetch('/charge-bank', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: reqData
+      });
+
+      const content = await rawResponse.json();
+      if(content.data.status === "error"){
+        alartDOM.classList.add("alert-info")
+        alartDOM.innerText = content.data.message
+      }else{
+        /// handle success
+        if(content.data.status === "success" && content.data.message === 'Charge initiated'){
+          handleOTP(content.data.data.flw_ref)
+
+        }
+      }
+
+      } catch (error) {
+        console.log(error)
+        
+      }
+
+      
+    })
+
+
+  });
+
+  
+
+  const handleOTP = (flw_ref) => {
+    const FormWrapperDOM = document.querySelector(".form-wrapper");
+    FormWrapperDOM.innerHTML = `
+            <form id="otp">
+            <div class="form-group">
+                <label for="">Enter OTP</label>
+                <input type="text" name="otp" class="form-control">
+            </div>
+            <div class="form-group">
+                <input type="submit"  class="btn btn-success btn-block" value="Continue">
+            </div>
+           </form>
+            `;
+            const otpFormDOM = document.querySelector("#otp");
+            otpFormDOM.addEventListener("submit", async e => {
+              try {
+              e.preventDefault();
+              const otp = document.querySelector('input[name="otp"]').value;
+              const reqOtpbody = {
+                type: "account",
+                flw_ref,
+                otp
+              }
+              const alartDOM = document.querySelector(".alert");
+              alartDOM.classList.remove("alert-info")
+              alartDOM.innerText = ""
+
+              const otpResData = await fetch('/validate', {
+                method: 'POST',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(reqOtpbody)
+              });
+              const content = await otpResData.json();
+              if(content.data.status === "error"){
+                alartDOM.classList.add("alert-info")
+                alartDOM.innerText = content.data.message
+              }else{
+                //// You can handle verification here
+                alert("successs")
+                
+              }
+               
+             } catch (error) {
+               console.log(error)
+               
+             }
+            })
+    
+  }
+
+
+  </script>
+
+</html>

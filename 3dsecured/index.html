@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+        <title>Flutterwave Charge Sample Apps</title>
+</head>
+<body>
+
+  <div class="container">
+    <div class="row">
+          <div class="col-md-12 text-center">
+            <h1> Card Transaction</h1>
+        </div>
+        <div class="offset-md-4 col-md-4 text-center">
+          <p style="text-align:left">
+            <b>Test with the below test card:</b><br>
+            4242424242424242 <br>
+            cvv 812 <br>
+            Expiry: 01/31 <br>
+        </p>
+
+      </div>
+
+      <div class="offset-md-4 col-md-4">
+        <div class="alert" role="alert">
+        
+      </div>
+
+
+
+    <div class="form-wrapper">
+        <form id="charge">
+          <div class="form-group">
+              <label for="">Email</label>
+              <input type="text" name="email" class="form-control">
+          </div>
+          <div class="form-group">
+              <label for="">Amount</label>
+              <input type="number" name="amount" class="form-control">
+          </div>
+          <div class="form-group">
+              <label for="">Card Number</label>
+              <input type="text" name="card_number" class="form-control">
+          </div>
+          <div class=" row form-group">
+              <div class="col-md-4">
+                  <label for="">Expiry Month</label>
+                  <input type="text" name="expiry_month" class="form-control">
+              </div>
+              <div class="col-md-4">
+                  <label for="">Expiry Year</label>
+                  <input type="text" name="expiry_year" class="form-control">
+              </div>
+              <div class="col-md-4">
+                  <label for="">CVV</label>
+                  <input type="text" name="cvv" class="form-control">
+              </div>
+          </div>
+          <div class="form-group">
+              <input type="submit" class="btn btn-success btn-block">
+          </div>
+      </form>
+    </div>
+
+      </div>
+
+
+
+
+
+    </div>
+</div>
+
+    
+    
+</body>
+
+<script>
+ 
+
+ 
+  
+  document.addEventListener("DOMContentLoaded", async () => {
+    const cardFormDOM = document.querySelector("#charge");
+
+    cardFormDOM.addEventListener("submit", async e => {
+      try {
+        e.preventDefault();
+      const email = document.querySelector('input[name="email"]').value;
+      const amount = document.querySelector('input[name="amount"]').value;
+      const card_number = document.querySelector('input[name="card_number"]').value;
+      const expiry_month = document.querySelector('input[name="expiry_month"]').value;
+      const expiry_year = document.querySelector('input[name="expiry_year"]').value;
+      const cvv = document.querySelector('input[name="cvv"]').value;
+
+      const reqData = JSON.stringify({
+          card_number,
+          currency: "NGN",
+          country: "NG",
+          redirect_url: 'http://localhost:3002', 
+          cvv,
+          amount,
+          expiry_year,
+          expiry_month,
+          email,
+          tx_ref: Date.now(),
+        })
+        const alartDOM = document.querySelector(".alert");
+        alartDOM.classList.remove("alert-info")
+        alartDOM.innerText = ""
+      
+      const rawResponse = await fetch('/charge', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: reqData
+      });
+
+      const content = await rawResponse.json();
+      if(content.data.status === "error"){
+        alartDOM.classList.add("alert-info")
+        alartDOM.innerText = content.data.message
+      }else{
+        /// handle success
+        if(content.data.status === "success" && content.data.meta.authorization.mode === 'redirect'){
+          window.location.href= content.data.meta.authorization.redirect;
+
+        }else{
+          sessionStorage.setItem(
+            "payload",
+            reqData
+          );
+          const state = content.data.meta.authorization.mode;
+          if(state === 'pin'){
+           handlePin(state) 
+          }
+
+        }
+      }
+
+      } catch (error) {
+        console.log(error)
+        
+      }
+
+      
+    })
+
+
+  });
+
+  const handlePin = (state) => {
+    const FormWrapperDOM = document.querySelector(".form-wrapper");
+    FormWrapperDOM.innerHTML = `
+            <form id="pin">
+                    <div class="form-group">
+                        <label for="">Enter Card Pin</label>
+                        <input type="text" name="pin" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <input type="submit"  class="btn btn-success btn-block" value="Continue">
+                    </div>
+                </form>
+            `;
+           const pinFormDOM = document.querySelector("#pin");
+           pinFormDOM.addEventListener("submit", async e => {
+             try {
+              e.preventDefault();
+              const alartDOM = document.querySelector(".alert");
+              alartDOM.classList.remove("alert-info")
+              alartDOM.innerText = ""
+              const pin = document.querySelector('input[name="pin"]').value;
+             
+              const storeReqData = JSON.parse(sessionStorage.getItem("payload"))
+              storeReqData['authorization'] = {
+                pin,
+                mode: state
+              }
+
+              const pinResData = await fetch('/charge', {
+                method: 'POST',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(storeReqData)
+              });
+
+             const content = await pinResData.json();
+             if(content.data.status === "error"){
+                
+                alartDOM.classList.add("alert-info")
+                alartDOM.innerText = content.data.message
+              }else{
+                console.log("time to call OTP")
+                console.log(content.data.data.flw_ref)
+                handleOTP(content.data.data.flw_ref)
+                
+                
+              }
+               
+             } catch (error) {
+               console.log(error)
+               
+             }
+           })
+
+
+           
+  }
+
+
+  const handleOTP = (flw_ref) => {
+    const FormWrapperDOM = document.querySelector(".form-wrapper");
+    FormWrapperDOM.innerHTML = `
+            <form id="otp">
+            <div class="form-group">
+                <label for="">Enter OTP</label>
+                <input type="text" name="otp" class="form-control">
+            </div>
+            <div class="form-group">
+                <input type="submit"  class="btn btn-success btn-block" value="Continue">
+            </div>
+           </form>
+            `;
+            const otpFormDOM = document.querySelector("#otp");
+            otpFormDOM.addEventListener("submit", async e => {
+              try {
+              e.preventDefault();
+              const otp = document.querySelector('input[name="otp"]').value;
+              const alartDOM = document.querySelector(".alert");
+              alartDOM.classList.remove("alert-info")
+              alartDOM.innerText = ""
+              const reqOtpbody = {
+                type: "card",
+                flw_ref,
+                otp
+              }
+
+              const otpResData = await fetch('/validate', {
+                method: 'POST',
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(reqOtpbody)
+              });
+              const content = await otpResData.json();
+              if(content.data.status === "error"){
+                alartDOM.classList.add("alert-info")
+                alartDOM.innerText = content.data.message
+              }else{
+                //// You can handle verification here
+                alert("successs")
+                
+              }
+               
+             } catch (error) {
+               console.log(error)
+               
+             }
+            })
+    
+  }
+
+
+  </script>
+
+</html>
