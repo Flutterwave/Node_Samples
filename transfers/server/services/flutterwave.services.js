@@ -2,9 +2,9 @@ import db from '../config/db';
 
 class UserService {
   
-  static async updateCustomerRecord(record, user) {
+  static async updateCustomerRecord(record, user, state) {
     const sql = 'UPDATE userdetails SET walletamount = $1 WHERE id = $2 RETURNING *';
-    const sum = Number(record.data.amountsettledforthistransaction) + Number(user.walletamount)
+    const sum = state === "remove"? Number(user.walletamount) - Number(record) :  Number(record) + Number(user.walletamount)
     const bindParameters = [Math.ceil(sum), user.id];
     const client = await db.connect();
     const result = await client.query(sql, bindParameters);

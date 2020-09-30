@@ -35,6 +35,45 @@ class UserController {
     }
   }
 
+  static async GetGroups(req, res) {
+    try {
+      const getGroups =   await userService.Groups(req.body)
+
+      return res.status(200).json({
+        status: 200,
+        data: getGroups
+      });
+      
+
+    } catch (error) {
+      console.log(error)
+      return res.status(404).json({
+        status: 404,
+        error: "Not Found",
+      });
+    }
+  }
+
+  static async AddGroups(req, res) {
+    try {
+      const addGroup =   await userService.CreateGroup(req.body)
+
+
+      return res.status(200).json({
+        status: 200,
+        data: addGroup,
+      });
+      
+
+    } catch (error) {
+      console.log(error)
+      return res.status(400).json({
+        status: 400,
+        error: "Error occured",
+      });
+    }
+  }
+
   
 }
 export default UserController;
