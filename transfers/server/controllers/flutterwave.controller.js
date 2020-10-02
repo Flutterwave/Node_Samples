@@ -92,6 +92,35 @@ class UserController {
     }
   }
 
+  static async BulkTransfer(req, res) {
+    try {
+
+     
+      const tansfer = await  axios({
+        url: `https://api.flutterwave.com/v3/bulk-transfers`,
+        method: "post",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer FLWSECK-46635852fe75cd2c112f19fa8c3850b2-X`,
+        },
+        data: {...req.body.reqBody}
+
+      })
+      console.log(tansfer.data.data)
+    
+      return res.status(200).json({
+        status: 200,
+      });
+
+    } catch (error) {
+      console.log(error)
+      return res.status(400).json({
+        status: 400,
+        error: "Something went wrong",
+      });
+    }
+  }
+
   static async Customers(req, res) {
     try {
       

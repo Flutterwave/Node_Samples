@@ -4,7 +4,7 @@ export const getGroups = async () => {
     const user = JSON.parse(
         sessionStorage.getItem("userData")
     );
-    const banks = await request({
+    const res = await request({
         url: `/auth/get-grops`,
         method: "POST",
         headers: {
@@ -14,7 +14,7 @@ export const getGroups = async () => {
         data: { ...user }
     });
 
-    return banks.data.data
+    return res.data.data
 
 }
 
@@ -30,6 +30,41 @@ export const addGroups = async (group, user) => {
     });
 
     alert("Group added successfully")
+    window.location.reload();
+
+    return groupRes.data.data
+
+}
+
+export const getMembers = async (id) => {
+   
+    const res = await request({
+        url: `/auth/get-members`,
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        data: { id }
+    });
+
+    return res.data.data
+
+}
+
+export const addMembers = async (member) => {
+    const groupRes = await request({
+        url: `/auth/add-members`,
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        data: { ...member }
+    });
+
+    alert("member added successfully")
+    window.location.reload();
 
     return groupRes.data.data
 
@@ -80,6 +115,29 @@ export const singleTransfer = async (info) => {
     );
         alert("transfer successful")
 }
+
+export const bulkTransfer = async (reqData) => {
+    const user = JSON.parse(
+        sessionStorage.getItem("userData")
+    );
+    const reqBody = {
+    title: "Simple payroll bulk transfer",
+    bulk_data: reqData,
+}
+    const res = await request({
+        url: `/flutterwave/bulk-transfer`,
+        method: "POST",
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json'
+        },
+        data: { reqBody, user }
+    });
+    console.log(res)
+    
+        alert("bulk transfer successful")
+}
+
 export const handlePay = (amount) => {
     const user = JSON.parse(
         sessionStorage.getItem("userData")

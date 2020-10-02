@@ -18,6 +18,7 @@ const App = () => (
       <Route  path="/dashboard" component={Dashboard} />
       <Route  path="/single-transfer" component={Dashboard} />
       <Route  path="/bulk-transfer" component={Dashboard} />
+      <Route  path="/members/:id" component={Dashboard} />
 
     </Switch>
   </Suspense>

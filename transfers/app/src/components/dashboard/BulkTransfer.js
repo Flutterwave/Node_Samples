@@ -1,6 +1,8 @@
 import React, {useState, useEffect} from 'react';
 import Modal from 'react-animated-modal'
 import {getGroups, addGroups} from '../../utils'
+import { Link } from 'react-router-dom'
+
 
 
 const App = () => {
@@ -101,7 +103,8 @@ const handleSubmit = (e) => {
                                         <div style={{backgroundColor:"#f8f8f8", width: "100%", padding: "20px", marginBottom:"10px"}}>
                                                 <h3>{item.groupname}</h3>
                                                 <p>{item.groupdesc}</p>
-                                                <a href='#' className='btn btn-sm btn-info pull-right'>View</a><br />
+                                                <Link className='btn btn-sm btn-info pull-right' to={`members/${item.id}`} >View </Link>
+                                                <br />
                                         </div>
                                     ))
                                 ):(

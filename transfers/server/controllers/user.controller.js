@@ -74,6 +74,46 @@ class UserController {
     }
   }
 
+  static async GetMembers(req, res) {
+    try {
+      const members =   await userService.Members(req.body.id)
+      return res.status(200).json({
+        status: 200,
+        data: members
+      });
+      
+
+    } catch (error) {
+      console.log(error)
+      return res.status(404).json({
+        status: 404,
+        error: "Not Found",
+      });
+    }
+  }
+
+  static async AddMember(req, res) {
+    try {
+      // console.log(req.body)
+
+      const addGroup =   await userService.CreateMember(req.body)
+      console.log(addGroup)
+
+      return res.status(200).json({
+        status: 200,
+        data: "addGroup",
+      });
+      
+
+    } catch (error) {
+      console.log(error)
+      return res.status(400).json({
+        status: 400,
+        error: "Error occured",
+      });
+    }
+  }
+
   
 }
 export default UserController;

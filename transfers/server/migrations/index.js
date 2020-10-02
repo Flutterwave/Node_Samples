@@ -45,6 +45,7 @@ const create = () => {
     groupid INTEGER NOT NULL,
     staffname VARCHAR(50) NOT NULL,
     staffbank VARCHAR(50) NOT NULL,
+    bankname VARCHAR(50) NOT NULL,
     staffacctno VARCHAR(50) NOT NULL,
     amount VARCHAR(50) NOT NULL,
     CONSTRAINT fk_owner FOREIGN KEY (groupid) REFERENCES  groups (id)
