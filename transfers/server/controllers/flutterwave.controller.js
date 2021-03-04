@@ -68,7 +68,7 @@ class UserController {
         method: "post",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer FLWSECK-46635852fe75cd2c112f19fa8c3850b2-X`,
+          Authorization: `Bearer FLWSECK-xxxxxxxxxxxxxxxxxxxxx-X`,
         },
         data: {...req.body.reqData}
 
@@ -101,7 +101,7 @@ class UserController {
         method: "post",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer FLWSECK-46635852fe75cd2c112f19fa8c3850b2-X`,
+          Authorization: `Bearer FLWSECK-xxxxxxxxxxxxxxxxxxxxx-X`,
         },
         data: {...req.body.reqBody}
 
